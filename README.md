@@ -1,8 +1,36 @@
 Introduction to Scala
 =====================
 
-This repo includes some basic Scala examples, which are intended to be
-used alongslide my introduction to scala slides.
+Scala is a modern progrmaming language that targets the Java Virtual Machine
+ (JVM) and thus can run (almost) anywhere. It offers access to two popular 
+programming paradiams, functional and object-oriented and so has received
+prase from fans of both models.
 
-Status: This course has only just started and the slides are in early 
-develpoment. As the course progresses more material will be added.
+This repo contains, an in development, introduction to programming course 
+based around Scala. It is intended for readers with little or no programming
+experience, unlike much of the current Scala material out there, and can be
+used for those interested specificly in Scala development or more generally
+those wanting to make head roads into the exciting world of application 
+development.
+
+Contents
+========
+
+Leature 01 - Introduction
+Leature 02 - Types, Values, and Control Flow
+Leature 03 - Classes and Objects (in development)
+
+This repo also includes some basic Scala examples, these are still in the very
+early stages of development and will be added to make more rounded in the 
+future.
+
+Books and other resources
+===========================
+
+Programming in Scala
+Martin Odersky, Lex Spoon, Bill Venners
+i2nd Edition, 2011, Artima Inc
+
+
+The main Scala website: http://www.scala-lang.org/.
+
