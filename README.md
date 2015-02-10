@@ -16,9 +16,9 @@ development.
 Contents
 ========
 
-Leature 01 - Introduction
-Leature 02 - Types, Values, and Control Flow
-Leature 03 - Classes and Objects (in development)
+* Leature 01 - Introduction
+* Leature 02 - Types, Values, and Control Flow
+* Leature 03 - Classes and Objects (in development)
 
 This repo also includes some basic Scala examples, these are still in the very
 early stages of development and will be added to make more rounded in the 
@@ -27,10 +27,11 @@ future.
 Books and other resources
 ===========================
 
+```
 Programming in Scala
 Martin Odersky, Lex Spoon, Bill Venners
-i2nd Edition, 2011, Artima Inc
-
+2nd Edition, 2011, Artima Inc
+```
 
 The main Scala website: http://www.scala-lang.org/.
 
