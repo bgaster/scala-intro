@@ -1,7 +1,6 @@
 This directory contains some Scala versions from the following book:
 
-Programming in Haskell
-
+    Programming in Haskell
     Graham Hutton, University of Nottingham
     Cambridge University Press, 2007
 
