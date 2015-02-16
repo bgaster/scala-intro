@@ -18,7 +18,8 @@ Contents
 
 * Leature 01 - Introduction
 * Leature 02 - Types, Values, and Control Flow
-* Leature 03 - Classes and Objects (in development)
+* Leature 03 - Objects and Classes
+* Leature 04 - Implementing Objects and Classes in Scala (in development)
 
 This repo also includes some basic Scala examples, these are still in the very
 early stages of development and will be added to make more rounded in the 
