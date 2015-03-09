@@ -10,8 +10,8 @@ This repo contains, an in development, introduction to programming course
 based around Scala. It is intended for readers with little or no programming
 experience, unlike much of the current Scala material out there, and can be
 used for those interested specificly in Scala development or more generally
-those wanting to make head roads into the exciting world of application 
-development.
+those wanting to make head roads into the exciting world of programming. 
+
 
 Contents
 ========
@@ -20,7 +20,9 @@ Contents
 * Leature 02 - Types, Values, and Control Flow
 * Leature 03 - Objects and Classes
 * Leature 04 - Implementing Classes 
-* Leature 05 - Recursion (in development)
+* Leature 05 - Arrays and A Simple 2D Graphics Library
+* Leature 06 - Recursion (in development)
+* Leature 07 - Containers (in development)
 
 This repo also includes some basic Scala examples, these are still in the very
 early stages of development and will be added to make more rounded in the 
