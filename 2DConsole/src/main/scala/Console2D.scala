@@ -1,7 +1,7 @@
 /*
  * The following code implements a very simple 2D graphics library.
- * The screen is represented as a 2D array of characters, supporting 
- * four different colors, black, red, green, and blue.
+ * The screen is represented as a 2D array, supporting four different
+ * colors, black, red, green, and blue. 
  *
  * Currently points are represented as to integers, x and y. 
  * 
@@ -9,64 +9,78 @@
  * 
  *      Color object represents colors
  *       ColorT - is the type used to represent colors
- *       black - is the color black
- *       red - is the color red
- *       green - is the color green
- *       blue - is the color blue
+ *       black  - is the color black
+ *       red    - is the color red
+ *       green  - is the color green
+ *       blue   - is the color blue
  * 
  *  The library consists of 3 base classes:
  * 
  *  
  *     Screen class represents our screen (in this case the console)
  *        primary constructor - takes size of screen in width and height
- *        on - method returns true if point is within screens coordiates
- *        setBackground - sets the background color
- *        getBackground - gets the background color
- *        getWidth - gets the width of the screen
- *        getHeight - gets the height of the screen
- *        setPoint - sets a given point on the screen to a specified color
- *        clear - sets each point in the screen to the current backgound color
+ *        on                  - method returns true if point is within screens coordiates
+ *        setBackground       - sets the background color
+ *        getBackground       - gets the background color
+ *        getWidth            - gets the width of the screen
+ *        getHeight           - gets the height of the screen
+ *        setPoint            - sets a given point on the screen to a specified color
+ *        clear               - sets each point in the screen to the current backgound color
  * 
  *      Shape abstract class resentents the set of all shapes that can be drawn
- *        draw - method implemented by subclasses to draw a particular shape
+ *        draw                - method implemented by subclasses to draw a particular shape
  * 
  *     Scene class represents a scene to be drawn, i.e. it is a collection of shapes
- *        push - add a shape to the scene. Shapes are drawn in newest first, i.e.
- *               last pushed is drawn first and earlier ones drawn over top, if they 
- *               overlap
- *        render - draw scene on a given screen
+ *        push                - add a shape to the scene. Shapes are drawn in newest first, i.e.
+ *                              last pushed is drawn first and earlier ones drawn over top, if they 
+ *                              overlap
+ *        render              - draw scene on a given screen
  * 
  *   The library has two subclasses that implement different shapes
  * 
+ *      Line                  - a line
+ *        primary constructor - takes coordiates x0,y0 and x1,y1 and a color
+ *        draw                - given a screen implements drawing a line between the two points, using
+ *                              an integer variant of Bresenham's algorithm 
+ * 
  *      Square - a square
- *      primary constructor - takes an x,y coordiate, size, and a color
- *      draw - given a screen implements drawing the sqaure on screen, if it fits
+ *        primary constructor - takes an x,y coordiate, size, and a color
+ *        draw                - given a screen implements drawing the sqaure on screen, if it fits
  * 
  *      Rectangle - a rectangle
- *      primary constructor - takes an x,y coordiate, width, height, and a color
- *      draw - given a screen implements drawing the rectangle on screen, if it fits
- *      NOTE: this implementation of draw is not given, it is your job to do so
- *
- * Note: the origin (0,0) is assumed to be at the top left corner of screen
+ *        primary constructor - takes an x,y coordiate, width, height, and a color
+ *        draw                - given a screen implements drawing the rectangle on screen, if it fits
+ *                              NOTE: assumes back to front rednering, i.e. the sequence of pushed shapes 
+ *                                    is submitted such that the last push will appear on top
+ * 
+ * NOTE: the origin (0,0) is assumed to be at the top left corner of screen
  *
  * Exercises: 
  *
- *   - implement a method to draw a rectangle of a given length and height at point x,y
- *   - reimplement the library to use a class to represent points
+ *   1. implement a method to draw a rectangle of a given length and height at point x,y
+ * 
+ *   2. reimplement the library to use a class to represent points
+ * 
+ *   3. reimplement the draw method for square and rectangle interms of Line
+ *      what do you notice about this approach?
+ * 
  */
-
 import Array._
 
 object Color {
-  type ColorT = Char
+  // We hack into the Console library to use background colors
+
+  type ColorT = String
 
   // attributes
 
-  val black : ColorT = ' '
-  val red   : ColorT = 'R'
-  val green : ColorT = 'G'
-  val blue  : ColorT = 'B'
+  val black : String = Console.BLACK_B
+  val red : String   = Console.RED_B
+  val green : String = Console.GREEN_B
+  val blue : String  = Console.BLUE_B
 
+  // As we are simply changing the background color, just print a space 
+  val char : String = " "
   // constructors
 
   // methods
@@ -111,24 +125,16 @@ class Screen ( sizeX : Int, sizeY : Int ) {
 
   // display the screen's contents to the console window
   def display() : Unit = {
-    for {
-      x <- 0 until sizeX+2
-    } print("_")
-
+    // send clear console sequence
+    print(background + "\033[2J")
+ 
     for (y <- 0 until sizeY) {
-      print("\n|")
-
       for {
         x <- 0 until sizeX
-      } print( screen(x)(y) )
+      } print( screen(x)(y) + Color.char)
 
-      print("|")
+      println("")
     }
-
-    println("")
-    for {
-      x <- 0 until sizeX+2
-    } print("_")
 
     println("")
   }
@@ -136,6 +142,33 @@ class Screen ( sizeX : Int, sizeY : Int ) {
 
 abstract class Shape {
   def draw( screen : Screen ) : Unit
+}
+
+class Line (
+  x0 : Int, y0 : Int,
+  x1 : Int, y1 : Int,
+  c : Color.ColorT ) extends Shape {
+
+  def draw( screen : Screen ) : Unit = {
+    val dx = x1 - x0
+    val dy = y1 - y0
+
+    var dir = 2*dy - dx
+    screen.setPoint(x0,y0,c)
+    var y = y0
+
+    for (x <- x0+1 until x1) {
+      if (dir > 0) {
+        y = y + 1
+        screen.setPoint(x,y,c)
+        dir = dir + (2*dy - 2*dx)
+      }
+      else {
+        screen.setPoint(x,y,c)
+        dir = dir + (2*dy)
+      }
+    }
+  }
 }
 
 class Square ( x : Int, y : Int, size : Int, c : Color.ColorT ) extends Shape {
@@ -173,7 +206,7 @@ class Scene {
 
   def render( screen : Screen ) : Unit = {
     screen.clear()
-    objects.foldLeft(()) ((a,shape) => shape.draw(screen))
+    objects.foldRight(()) ((shape,a) => shape.draw(screen))
   }
 }
 
@@ -181,11 +214,11 @@ object Console2D {
   def main(args: Array[String]) {
 
     // Setup the display
-    val screen = new Screen(10,10)
+    val screen = new Screen(20,20)
     screen.setBackground(Color.black)
 
     // Draw a simple scene, consisting of 2 squares and a (yet to be
-    // implemented) rectangle
+    // implemented) rectangle, and a line
 
     var scene = new Scene()
 
@@ -197,6 +230,9 @@ object Console2D {
     // draw a couple of overlapping squares
     scene.push(new Square(2,2,3,Color.red))
     scene.push(new Square(4,1,2,Color.green))
+
+    // draw a line
+    scene.push(new Line(6,10,15,20, Color.blue))
 
     // draw a rectangle
     scene.push(new Rectangle(1,6,7,2,Color.blue))
