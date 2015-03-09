@@ -67,6 +67,8 @@
  *   4. modify the Screen class to use the length method of the screen
  *      array rather than width and height
  * 
+ *   6. Extend the library to support displaying text
+ * 
  */
 import Array._
 
