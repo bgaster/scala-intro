@@ -43,6 +43,11 @@
  *        draw                - given a screen implements drawing a line between the two points, using
  *                              an integer variant of Bresenham's algorithm 
  * 
+ *      Circle                - a circle
+ *        primary constructor - takes center coordiates x,y, radius, color, and optional fill
+ *        draw                - given a screen implements drawing a cicle at postion x,y, with 
+ *                              said radius. The circle is filled is requested at construction
+ * 
  *      Square - a square
  *        primary constructor - takes an x,y coordiate, size, and a color
  *        draw                - given a screen implements drawing the sqaure on screen, if it fits
@@ -152,7 +157,7 @@ package console2D {
     def draw( screen : Screen ) : Unit
   }
 
-  class Line (
+  case class Line (
     x0 : Int, y0 : Int,
     x1 : Int, y1 : Int,
     c : Color.ColorT ) extends Shape {
@@ -165,7 +170,7 @@ package console2D {
       screen.setPoint(x0,y0,c)
       var y = y0
 
-      for (x <- x0+1 until x1) {
+      for (x <- x0+1 to x1) {
         if (dir > 0) {
           y = y + 1
           screen.setPoint(x,y,c)
@@ -174,6 +179,47 @@ package console2D {
         else {
           screen.setPoint(x,y,c)
           dir = dir + (2*dy)
+        }
+      }
+    }
+  }
+
+  class Circle(
+    x : Int, y : Int, radius : Int,
+    c : Color.ColorT, fill : Boolean = false ) extends Shape {
+
+    // Simple modification of midpoint circle algroithm allows us to
+    // produce filled or non-filled circles
+    private def drawPointsOrLine(
+      x0 : Int, y0 : Int,
+      x1 : Int, y1 :Int,
+      screen : Screen ) : Unit = {
+
+      if (fill)
+        Line(x0, y0, x1, y1, c).draw(screen)
+      else {
+        screen.setPoint(x0, y0, c)
+        screen.setPoint(x1, y1, c)
+      }
+    }
+
+    def draw ( screen : Screen ) : Unit = {
+      var xx = radius
+      var yy = 0
+      var error = 1-xx
+
+      while (xx >= yy) {
+        drawPointsOrLine(-xx + x, yy + y, xx + x, yy + y, screen)
+        drawPointsOrLine(-yy + x, xx + y, yy + x, xx + y, screen)
+        drawPointsOrLine(-xx + x, -yy + y, xx + x, -yy + y, screen)
+        drawPointsOrLine(-yy + x, -xx + y, yy + x, -xx + y, screen)
+
+        yy = yy + 1
+        if (error < 0)
+          error = error + 2 * yy + 1
+        else {
+          xx = xx - 1
+          error = error + 2 * (yy - xx) + 1
         }
       }
     }
@@ -225,7 +271,7 @@ object Main {
     import console2D._
 
     // Setup the display
-    val screen = new Screen(20,20)
+    val screen = new Screen(60,30)
     screen.setBackground(Color.black)
 
     // Draw a simple scene, consisting of 2 squares and a (yet to be
@@ -244,6 +290,9 @@ object Main {
 
     // draw a line
     scene.push(new Line(6,10,15,20, Color.blue))
+
+    scene.push(new Circle(20, 10, 2, Color.red))
+    scene.push(new Circle(30, 10, 2, Color.red, true))
 
     // draw a rectangle
     scene.push(new Rectangle(1,6,7,2,Color.blue))
