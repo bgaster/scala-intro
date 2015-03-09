@@ -64,154 +64,163 @@
  *   3. reimplement the draw method for square and rectangle interms of Line
  *      what do you notice about this approach?
  * 
+ *   4. modify the Screen class to use the length method of the screen
+ *      array rather than width and height
+ * 
  */
 import Array._
 
-object Color {
-  // We hack into the Console library to use background colors
+package console2D {
 
-  type ColorT = String
+  object Color {
+    // We hack into the Console library to use background colors
 
-  // attributes
+    type ColorT = String
 
-  val black : String = Console.BLACK_B
-  val red : String   = Console.RED_B
-  val green : String = Console.GREEN_B
-  val blue : String  = Console.BLUE_B
+    // attributes
 
-  // As we are simply changing the background color, just print a space 
-  val char : String = " "
-  // constructors
+    // As we are simply changing the background color, just print a space
+    private val char : String = " "
 
-  // methods
-}
+    val black : String = Console.BLACK_B + char
+    val red : String   = Console.RED_B + char
+    val green : String = Console.GREEN_B + char
+    val blue : String  = Console.BLUE_B + char
 
-class Screen ( sizeX : Int, sizeY : Int ) {
+    // constructors
 
-  type ScreenT = Array[Array[Color.ColorT]]
+    // methods
+  }
 
-  // attributes
+  class Screen ( val width : Int, val height : Int ) {
 
-  private var screen : ScreenT = ofDim[Color.ColorT](sizeX, sizeY)
+    private type ScreenT = Array[Array[Color.ColorT]]
 
-  private var background : Color.ColorT = Color.black
+    // attributes
 
-  // constuructors
-  clear() // clear the screen on construction
+    private var screen : ScreenT = ofDim[Color.ColorT](width, height)
 
-  // methods
+    private var background : Color.ColorT = Color.black
 
-  // return true if point sits on screen, otherwise false
-  def on( x : Int, y : Int ) : Boolean =
-    x >= 0 && x < sizeX && y >= 0 && y < sizeY
+    // constuructors
+    clear() // clear the screen on construction
 
-  def setBackground ( c : Color.ColorT ) : Unit =
-    background = c
+    // methods
 
-  def getBackground() : Color.ColorT = background
+    // return true if point sits on screen, otherwise false
+    def on( x : Int, y : Int ) : Boolean =
+      x >= 0 && x < width && y >= 0 && y < height
 
-  def getSizeX() : Int = sizeX
-  def getSizeY() : Int = sizeY
+    def setBackground ( c : Color.ColorT ) : Unit =
+      background = c
 
-  def setPoint( x : Int, y : Int , c : Color.ColorT ) =
-    screen(x)(y) = c
+    def getBackground() : Color.ColorT = background
 
-  // clear the screen with current background color
-  def clear() : Unit =
-    for {
-      y <- 0 until sizeY
-      x <- 0 until sizeX
-    } screen(x)(y) = background
+    def getSizeX() : Int = width
+    def getSizeY() : Int = height
 
-  // display the screen's contents to the console window
-  def display() : Unit = {
-    // send clear console sequence
-    print(background + "\033[2J")
- 
-    for (y <- 0 until sizeY) {
+    def setPoint( x : Int, y : Int , c : Color.ColorT ) =
+      screen(x)(y) = c
+
+    // clear the screen with current background color
+    def clear() : Unit =
       for {
-        x <- 0 until sizeX
-      } print( screen(x)(y) + Color.char)
+        y <- 0 until height
+        x <- 0 until width
+      } screen(x)(y) = background
+
+    // display the screen's contents to the console window
+    def display() : Unit = {
+      // send clear console sequence
+      print(background + "\033[2J")
+
+      for (y <- 0 until height) {
+        for {
+          x <- 0 until width
+        } print( screen(x)(y) ) //+ Color.char)
+
+        println("")
+      }
 
       println("")
     }
-
-    println("")
   }
-}
 
-abstract class Shape {
-  def draw( screen : Screen ) : Unit
-}
+  abstract class Shape {
+    def draw( screen : Screen ) : Unit
+  }
 
-class Line (
-  x0 : Int, y0 : Int,
-  x1 : Int, y1 : Int,
-  c : Color.ColorT ) extends Shape {
+  class Line (
+    x0 : Int, y0 : Int,
+    x1 : Int, y1 : Int,
+    c : Color.ColorT ) extends Shape {
 
-  def draw( screen : Screen ) : Unit = {
-    val dx = x1 - x0
-    val dy = y1 - y0
+    def draw( screen : Screen ) : Unit = {
+      val dx = x1 - x0
+      val dy = y1 - y0
 
-    var dir = 2*dy - dx
-    screen.setPoint(x0,y0,c)
-    var y = y0
+      var dir = 2*dy - dx
+      screen.setPoint(x0,y0,c)
+      var y = y0
 
-    for (x <- x0+1 until x1) {
-      if (dir > 0) {
-        y = y + 1
-        screen.setPoint(x,y,c)
-        dir = dir + (2*dy - 2*dx)
-      }
-      else {
-        screen.setPoint(x,y,c)
-        dir = dir + (2*dy)
+      for (x <- x0+1 until x1) {
+        if (dir > 0) {
+          y = y + 1
+          screen.setPoint(x,y,c)
+          dir = dir + (2*dy - 2*dx)
+        }
+        else {
+          screen.setPoint(x,y,c)
+          dir = dir + (2*dy)
+        }
       }
     }
   }
-}
 
-class Square ( x : Int, y : Int, size : Int, c : Color.ColorT ) extends Shape {
-  def draw( screen : Screen ) : Unit = {
-    if (screen.on(x,y) && screen.on(x+size, y+size))
-      for {
-        yy <- y until y + size
-        xx <- x until x + size
-      } screen.setPoint(xx,yy,c)
-    else
-      ()
+  class Square ( x : Int, y : Int, size : Int, c : Color.ColorT ) extends Shape {
+    def draw( screen : Screen ) : Unit = {
+      if (screen.on(x,y) && screen.on(x+size, y+size))
+        for {
+          yy <- y until y + size
+          xx <- x until x + size
+        } screen.setPoint(xx,yy,c)
+      else
+        ()
+    }
   }
-}
 
-class Rectangle (
-  x : Int,
-  y : Int,
-  width : Int,
-  height : Int,
-  c : Color.ColorT) extends Shape {
+  class Rectangle (
+    x : Int,
+    y : Int,
+    width : Int,
+    height : Int,
+    c : Color.ColorT) extends Shape {
 
-  def draw(  screen : Screen ) : Unit = {
-    // exercise to implement
+    def draw(  screen : Screen ) : Unit = {
+      // exercise to implement
+    }
   }
-}
 
-/*
- *  A scene consists of a list of shapes to be rendered
- */
-class Scene {
-  private var objects : List[Shape] = Nil
+  /*
+   *  A scene consists of a list of shapes to be rendered
+   */
+  class Scene {
+    private var objects : List[Shape] = Nil
 
-  def push( s : Shape ) =
-    objects = s :: objects
+    def push( s : Shape ) =
+      objects = s :: objects
 
-  def render( screen : Screen ) : Unit = {
-    screen.clear()
-    objects.foldRight(()) ((shape,a) => shape.draw(screen))
+    def render( screen : Screen ) : Unit = {
+      screen.clear()
+      objects.foldRight(()) ((shape,a) => shape.draw(screen))
+    }
   }
-}
 
-object Console2D {
+} // package console2D
+
+object Main {
   def main(args: Array[String]) {
+    import console2D._
 
     // Setup the display
     val screen = new Screen(20,20)
