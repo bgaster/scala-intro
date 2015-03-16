@@ -52,20 +52,45 @@ package object BasicRecursion {
   //    the value (at that position in list) and the result of a recursive call
   //    to the executing function. We can abstract this notion...
 
-  def foldList ( f : (Int, Int) => Int, unit : Int, is : List[Int] ) : Int =
+  // simple (not tail recursive version)
+  def foldListStackOverflow ( f : (Int, Int) => Int, unit : Int, is : List[Int] ) : Int =
     is match {
     case Nil     => unit
     case i :: is => f(i, foldList(f, unit, is))
     }
 
+  // the more complicated tail recursive version
+  def foldList ( f : (Int, Int) => Int, unit : Int, is : List[Int] ) : Int = {
+    @tailrec
+    def foldL( acc : Int, f : (Int, Int) => Int, is : List[Int] ) : Int =
+      is match {
+        case Nil     => acc
+        case i :: is => foldL(f(i,acc), f, is)
+      }
+
+    foldL(unit, f, is)
+  }
+
   val sum = (xs : List[Int]) => foldList((x,y) => x + y,  0, xs)
 
-  def fib( n : Int) : Int = n match {
+  // simple (non tail recursive version)
+  def fibStackOverflow( n : Int) : Int = n match {
    case 1 | 2 => n
    case _ => fib( n-1 ) + fib( n-2 )
   }
-}
 
+  // the more complicated tail recursive version
+  def fib( n : Int) : Int = {
+    @tailrec
+    def fibTail( n : Int, a : Int, b : Int ) : Int =
+      n match {
+        case 0 => a
+        case _ =>  fibTail(n-1, b, a+b)
+      }
+
+    fibTail(n, 0, 1)
+  }
+}
 
 object Main {
   def main(args: Array[String]) {
@@ -82,7 +107,7 @@ object Main {
     println("foldInt(sum)  = " + foldList((x,y) => x + y,  0, xs))
     println("foldInt(prod) = " + foldList((x,y) => x * y,  1, xs))
 
-    println("fib(5) = " + fib(5))
+    println("fib(9) = " + fib(9))
 
   }
 }
