@@ -21,7 +21,7 @@ Contents
 * Leature 03 - Objects and Classes
 * Leature 04 - Implementing Classes 
 * Leature 05 - Arrays and A Simple 2D Graphics Library
-* Leature 06 - Recursion (in development)
+* Leature 06 - Recursion and Data Structures
 * Leature 07 - Containers (in development)
 
 This repo also includes some basic Scala examples, these are still in the very
